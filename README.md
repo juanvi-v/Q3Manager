@@ -1,5 +1,5 @@
 Q3Manager
 =========
 
-Collection of Backoffice building utilities.
+Collection of backoffice building utilities for CakePHP.
 
