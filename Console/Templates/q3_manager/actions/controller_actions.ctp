@@ -26,11 +26,11 @@
  */
 	public function <?php echo $admin ?>index() {
 		//$this-><?php echo $currentModelName ?>->recursive = 0;
-    /**
-     * These are ignored here
-     */
-    unset($this->params->data['Selected']); //select items
-    unset($this->params->data['<?php echo $currentModelName;?>']['main']); //select all items
+		/**
+		 * These are ignored here
+		 */
+		unset($this->params->data['Selected']); //select items
+		unset($this->params->data['<?php echo $currentModelName;?>']['main']); //select all items
 
 		$conditions = $this->_parseSearch();
 		$this->set('<?php echo $pluralName ?>', $this->paginate($conditions));
@@ -100,13 +100,19 @@
  */
 	public function <?php echo $admin ?>add() {
 		if ($this->request->is('post')) {
+			if(!empty($this->request->data['<?php echo $currentModelName;?>']['return_url'])){
+				$return_url=$this->request->data['<?php echo $currentModelName;?>']['return_url'];
+			}
+			else{
+				$return_url=array('action'=>'index');
+			}
 			$this-><?php echo $currentModelName; ?>->create();
 			if ($this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 <?php if ($wannaUseSession): ?>
 				$this->Session->setFlash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->redirect($return_url);
 <?php else: ?>
-				$this->flash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($currentModelName)); ?> saved.'), array('action' => 'index'));
+				$this->flash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($currentModelName)); ?> saved.'), $return_url);
 <?php endif; ?>
 			} else {
 <?php if ($wannaUseSession): ?>
@@ -159,6 +165,7 @@
     echo "\t\t\$this->set(compact(".implode(',',$references_list)."));\n";
   }
 ?>
+    $this->set('return_url',$this->referer());
 		$this->render('<?php echo $admin ?>edit');
 	}
 
@@ -175,12 +182,18 @@
 			throw new NotFoundException(__d('{$plugin_domain}','Invalid <?php echo strtolower($singularHumanName); ?>'));
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
+			if(!empty($this->request->data['<?php echo $currentModelName;?>']['return_url'])){
+				$return_url=$this->request->data['<?php echo $currentModelName;?>']['return_url'];
+			}
+			else{
+				$return_url=array('action'=>'index');
+			}
 			if ($this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 <?php if ($wannaUseSession): ?>
 				$this->Session->setFlash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved'));
-				$this->redirect(array('action' => 'index'));
+				$this->redirect($return_url);
 <?php else: ?>
-				$this->flash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved.'), array('action' => 'index'));
+				$this->flash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved.'), $return_url);
 <?php endif; ?>
 			} else {
 <?php if ($wannaUseSession): ?>
@@ -239,6 +252,7 @@
 
 
 	?>
+    $this->set('return_url',$this->referer());
 	}
 
 /**
