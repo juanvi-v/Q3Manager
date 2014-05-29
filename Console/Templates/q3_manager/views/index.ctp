@@ -1,5 +1,6 @@
 <?php
 $plugin_domain=Inflector::underscore($plugin);
+$parent_field=Inflector::underscore($modelClass);
 echo "<?php\n";
 echo "echo \$this->Form->create('{$modelClass}',array('url' => array('action' => 'index','plugin'=>false),'id'=>'index_form'));\n";
 echo "?>\n";
@@ -64,21 +65,28 @@ echo "?>\n";
 	?>
 	</ul>
 	</div>
-	
+
 	<table>
 	<thead>
 	<tr>
 		<th rowspan="2"><?php echo "<?php echo \$this->Form->checkbox('main', array('id'=>'main')); ?>"; ?></th>
 	<?php $filter_row='<tr class="filter">';?>
 	<?php foreach ($fields as $field):
-		if (in_array($field, array($primaryKey, 'modified'))) {
+		if (in_array($field, array($primaryKey, 'modified','password'))) {
 			continue;
 		}
 	?>
 		<?php $field_name=preg_replace('/_id$/','',$field);?>
 		<?php
+
 			if($field_name!=$field){
-				$referenced_field=Inflector::camelize($field_name).'.name';
+				if($field_name==$parent_field){
+					$referenced_field='Parent'.$modelClass.'.'.$displayField;
+					$field_name='parent_'.$field_name;
+				}
+				else{
+					$referenced_field=Inflector::camelize($field_name).'.name';
+				}
 			}
 			else{
 				$referenced_field=$field;
@@ -89,7 +97,13 @@ echo "?>\n";
 				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$status_list));?></td>";
 			}
 			elseif($field_name!=$field){
-				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$".Inflector::pluralize($field_name)."));?></td>";
+				if($field==$parent_field){
+					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$parent_".Inflector::pluralize($field_name)."));?></td>";
+				}
+				else{
+					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$".Inflector::pluralize($field_name)."));?></td>";
+				}
+
 			}
 			else{
 				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false,'type'=>'text','placeholder'=>__d('{$plugin_domain}','Filter by %s',__d('{$plugin_domain}','$field')),'required'=>false));?></td>";
@@ -148,20 +162,31 @@ echo "?>\n";
 							);
 						}\n
 					?></td>\n";
+				} elseif ($field == 'email') {
+					echo "\t\t<td><?php echo \$this->Html->link(\${$singularVar}['{$modelClass}']['{$field}'],'mailto:'.\${$singularVar}['{$modelClass}']['{$field}']); ?>&nbsp;</td>\n";
 				} elseif ($field == 'avatar') {
 					echo "\t\t<td>
 						<?php
 							echo \$this->Html->image('{$modelClass}/' . \${$singularVar}['{$modelClass}']['{$field}'] . ',fitCrop,100,100.jpg');
 					?></td>\n";
 				} elseif($field_name!=$field){
-					$referenced_model=Inflector::camelize($field_name);
-					echo "\t\t<td><?php echo h(\${$singularVar}['{$referenced_model}']['name']); ?>&nbsp;</td>\n";
+					if($field_name==$parent_field){
+
+						echo "\t\t<td><?php echo h(\${$singularVar}['Parent{$modelClass}']['{$displayField}']); ?>&nbsp;</td>\n";
+					}
+					else{
+						$referenced_model=Inflector::camelize($field_name);
+						/**
+						 * @TODO this should use the display name of the referenced model instead of the name field
+						 */
+						echo "\t\t<td><?php echo h(\${$singularVar}['{$referenced_model}']['name']); ?>&nbsp;</td>\n";
+					}
 				} elseif (in_array(strtolower(ClassRegistry::init($modelClass)->getColumnType($field)), array('date', 'datetime'))) {
-					echo "\t\t<td><?php echo \$this->Date->dateFormat(\${$singularVar}['{$modelClass}']['{$field}'],'timestamp'); ?>&nbsp;</td>\n";
+						echo "\t\t<td><?php echo \$this->Date->dateFormat(\${$singularVar}['{$modelClass}']['{$field}'],'timestamp'); ?>&nbsp;</td>\n";
 				} elseif (strtolower(ClassRegistry::init($modelClass)->getColumnType($field)) == 'text') {
-					echo "\t\t<td><?php echo h(\${$singularVar}['{$modelClass}']['{$field}'], 250); ?>&nbsp;</td>\n";
+						echo "\t\t<td><?php echo h(\${$singularVar}['{$modelClass}']['{$field}'], 250); ?>&nbsp;</td>\n";
 				} else {
-					echo "\t\t<td><?php echo h(\${$singularVar}['{$modelClass}']['{$field}']); ?>&nbsp;</td>\n";
+						echo "\t\t<td><?php echo h(\${$singularVar}['{$modelClass}']['{$field}']); ?>&nbsp;</td>\n";
 				}
 			}
 		}

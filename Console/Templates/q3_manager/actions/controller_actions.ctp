@@ -49,15 +49,22 @@
         $field_name=preg_replace('/_id$/','',$field);
         if($field=='status'){
           $references_list[]="'status_list'";
-          echo "\$status_list=\$this->{$currentModelName}->getStatusList();\n";
+          echo "\t\t\$status_list=\$this->{$currentModelName}->getStatusList();\n";
         }
         elseif($field_name!=$field){
           $field_list=Inflector::pluralize($field_name);
           $field_model=Inflector::camelize($field_name);
-          echo "\t\t\$$field_list=ClassRegistry::init('$field_model')->find('list');\n";
-          $references_list[]="'$field_list'";
+
+
           if($field_model<>$currentModelName){
-            $models_list[]="'$field_model'";
+               echo "\t\t\$${field_list}=ClassRegistry::init('$field_model')->find('list');\n";
+               $models_list[]="'${field_model}'";
+               $references_list[]="'${field_list}'";
+          }
+          else{
+               echo "\t\t\$parent_${field_list}=ClassRegistry::init('$field_model')->find('list');\n";
+               $models_list[]="'Parent{$field_model}'=>array('className'=>'{$field_model}','foreignKey'=>'{$field}')";
+               $references_list[]="'parent_${field_list}'";
           }
 
         }
