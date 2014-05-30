@@ -94,14 +94,14 @@ echo "?>\n";
 			?>
 		<th><?php echo "<?php echo \$this->Paginator->sort('{$referenced_field}',__d('{$plugin_domain}','".Inflector::humanize($field_name)."')); ?>"; ?></th>
 		<?php if($field=='status'){
-				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$status_list));?></td>";
+				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$status_list,'required'=>false));?></td>";
 			}
 			elseif($field_name!=$field){
 				if($field==$parent_field){
-					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$parent_".Inflector::pluralize($field_name)."));?></td>";
+					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$parent_".Inflector::pluralize($field_name).",'required'=>false));?></td>";
 				}
 				else{
-					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$".Inflector::pluralize($field_name)."));?></td>";
+					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$".Inflector::pluralize($field_name).",'required'=>false));?></td>";
 				}
 
 			}
@@ -171,7 +171,6 @@ echo "?>\n";
 					?></td>\n";
 				} elseif($field_name!=$field){
 					if($field_name==$parent_field){
-
 						echo "\t\t<td><?php echo h(\${$singularVar}['Parent{$modelClass}']['{$displayField}']); ?>&nbsp;</td>\n";
 					}
 					else{
