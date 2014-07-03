@@ -1,4 +1,9 @@
-<?php $plugin_domain=Inflector::underscore($plugin); ?>
+<?php
+require_once(dirname(__FILE__).'/../utils/Tools.php');
+
+$plugin_domain=Inflector::underscore($plugin);
+$tools= new Tools($plugin_domain);
+?>
 /**
  * <?php echo $admin ?>index method
  *
@@ -73,7 +78,7 @@
  */
 	public function <?php echo $admin ?>view($id = null) {
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
-			throw new NotFoundException(__d('{$plugin_domain}','Invalid <?php echo strtolower($singularHumanName); ?>'));
+			throw new NotFoundException(<?php echo $tools->translate('Invalid '.strtolower($singularHumanName)); ?>);
 		}
 		$options = array('conditions' => array('<?php echo $currentModelName; ?>.' . $this-><?php echo $currentModelName; ?>->primaryKey => $id));
 		$this->set('<?php echo $singularName; ?>', $this-><?php echo $currentModelName; ?>->find('first', $options));
@@ -96,14 +101,14 @@
 			$this-><?php echo $currentModelName; ?>->create();
 			if ($this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 <?php if ($wannaUseSession): ?>
-				$this->Session->setFlash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved'));
+				$this->Session->setFlash(<?php echo $tools->translate('The '.strtolower($singularHumanName).' has been saved');?>);
 				$this->redirect($return_url);
 <?php else: ?>
-				$this->flash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($currentModelName)); ?> saved.'), $return_url);
+				$this->flash(<?php echo $tools->translate(ucfirst(strtolower($currentModelName)).' saved.');?>, $return_url);
 <?php endif; ?>
 			} else {
 <?php if ($wannaUseSession): ?>
-				$this->Session->setFlash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> could not be saved. Please, try again.'));
+				$this->Session->setFlash(<?php echo $tools->translate('The '.strtolower($singularHumanName).' could not be saved. Please, try again.');?>);
 <?php endif; ?>
 			}
 		}
@@ -134,7 +139,9 @@
   foreach($fields as $field):
       $field_name=preg_replace('/_id$/','',$field);
       if($field=='status'){
-        echo "//status $field\n";
+        //echo "//status $field\n";
+        $references_list[]="'status_list'";
+        echo "\t\t\$status_list=\$this->{$currentModelName}->getStatusList();\n";
       }
       elseif($field_name!=$field){
         $field_list=Inflector::pluralize($field_name);
@@ -166,7 +173,7 @@
  */
 	public function <?php echo $admin; ?>edit($id = null) {
 		if (!$this-><?php echo $currentModelName; ?>->exists($id)) {
-			throw new NotFoundException(__d('{$plugin_domain}','Invalid <?php echo strtolower($singularHumanName); ?>'));
+			throw new NotFoundException(<?php echo $tools->translate('Invalid '.strtolower($singularHumanName));?>);
 		}
 		if ($this->request->is('post') || $this->request->is('put')) {
 			if(!empty($this->request->data['<?php echo $currentModelName;?>']['return_url'])){
@@ -177,14 +184,14 @@
 			}
 			if ($this-><?php echo $currentModelName; ?>->save($this->request->data)) {
 <?php if ($wannaUseSession): ?>
-				$this->Session->setFlash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved'));
+				$this->Session->setFlash(<?php echo $tools->translate('The '.strtolower($singularHumanName).' has been saved');?>);
 				$this->redirect($return_url);
 <?php else: ?>
-				$this->flash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> has been saved.'), $return_url);
+				$this->flash(<?php echo $tools->translate('The '.strtolower($singularHumanName).' has been saved.');?>, $return_url);
 <?php endif; ?>
 			} else {
 <?php if ($wannaUseSession): ?>
-				$this->Session->setFlash(__d('{$plugin_domain}','The <?php echo strtolower($singularHumanName); ?> could not be saved. Please, try again.'));
+				$this->Session->setFlash(<?php echo $tools->translate('The '.strtolower($singularHumanName).' could not be saved. Please, try again.');?>);
 <?php endif; ?>
 			}
 		} else {
@@ -219,7 +226,9 @@
     foreach($fields as $field):
         $field_name=preg_replace('/_id$/','',$field);
         if($field=='status'){
-          echo "//status $field\n";
+          //echo "//status $field\n";
+          $references_list[]="'status_list'";
+          echo "\t\t\$status_list=\$this->{$currentModelName}->getStatusList();\n";
         }
         elseif($field_name!=$field){
           $field_list=Inflector::pluralize($field_name);
@@ -275,22 +284,22 @@
 				}
 				if ($error) {
 <?php if ($wannaUseSession): ?>
-					$this->Session->setFlash(__d('{$plugin_domain}','Operation error'));
+					$this->Session->setFlash(<?php echo $tools->translate('Operation error');?>);
 <?php else: ?>
-					$this->flash(__d('{$plugin_domain}','Operation error'), array('action' => 'index'));
+					$this->flash(<?php echo $tools->translate('Operation error');?>, array('action' => 'index'));
 <?php endif; ?>
 				} else {
 <?php if ($wannaUseSession): ?>
-					$this->Session->setFlash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> deleted'));
+					$this->Session->setFlash(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' deleted');?>);
 <?php else: ?>
 					$url = array('action' => 'index');
-					$this->flash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> deleted'), $url);
+					$this->flash(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' deleted');?>, $url);
 <?php endif; ?>
 				}
 			}
 			$this->redirect(array('action' => 'index'));
 		} elseif (empty($ids)) {
-			throw new NotFoundException(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> not found'));
+			throw new NotFoundException(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' not found');?>);
 			$this->redirect(array('action' => 'index'));
 		}
 		$<?php echo $pluralName; ?> = $this-><?php echo $currentModelName; ?>->find('all', array(
@@ -335,21 +344,21 @@
 				}
 				if ($error) {
 <?php if ($wannaUseSession): ?>
-					$this->Session->setFlash(__d('{$plugin_domain}','Operation error'));
+					$this->Session->setFlash(<?php echo $tools->translate('Operation error');?>);
 <?php else: ?>
-					$this->flash(__d('{$plugin_domain}','Operation error'), array('action' => 'index'));
+					$this->flash(<?php echo $tools->translate('Operation error');?>, array('action' => 'index'));
 <?php endif; ?>
 				} else {
 <?php if ($wannaUseSession): ?>
-					($status)?$this->Session->setFlash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> enabled')):$this->Session->setFlash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> disabled'));
+					($status)?$this->Session->setFlash(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' enabled');?>):$this->Session->setFlash(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' disabled');?>);
 <?php else: ?>
 					$url = array('action' => 'index');
-					($status)?$this->flash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> enabled'), $url):$this->flash(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> disabled'), $url);
+					($status)?$this->flash(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' enabled');?>, $url):$this->flash(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' disabled');?>, $url);
 <?php endif; ?>
 				}
 			}
 		} else {
-			throw new NotFoundException(__d('{$plugin_domain}','<?php echo ucfirst(strtolower($pluralHumanName)); ?> not found'));
+			throw new NotFoundException(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' not found');?>);
 		}
 		$this->redirect(array('action' => 'index'));
 	}

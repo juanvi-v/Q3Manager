@@ -1,6 +1,10 @@
 <?php
-     $plugin_domain = Inflector::underscore($plugin);
-       $actionTitle = Inflector::humanize($action);
+     require_once(dirname(__FILE__).'/../utils/Tools.php');
+
+     $plugin_domain=Inflector::underscore($plugin);
+     $tools= new Tools($plugin_domain);
+
+     $actionTitle = Inflector::humanize($action);
 ?>
 <div class="<?php echo $pluralVar; ?> form">
 <?php
@@ -11,14 +15,14 @@ if (ClassRegistry::init($modelClass)->hasField('avatar')) {
 }
 ?>
 	<fieldset>
-		<legend><?php printf("<?php echo __d('{$plugin_domain}','%s %%s',__d('{$plugin_domain}','%s')); ?>", $actionTitle , $singularHumanName); ?></legend>
+		<legend><?php printf("<?php echo ".$tools->translate('%s %%s',$tools->translate('%s'))."; ?>", $actionTitle , $singularHumanName); ?></legend>
 <?php
 		echo "\t<?php\n";
 
     echo "\t\techo \$this->Form->hidden('return_url',array('value'=>\$return_url));\n";
 		foreach ($fields as $field) {
         $field_name=preg_replace('/_id$/','',$field);
-        $field_options="'label'=>__d('{$plugin_domain}','".Inflector::humanize($field_name)."')";
+        $field_options="'label'=>".$tools->translate(Inflector::humanize($field_name));
 			if (strpos($action, 'add') !== false && $field == $primaryKey) {
 				continue;
 			} elseif (!in_array($field, array('created', 'modified', 'updated'))) {
@@ -26,10 +30,12 @@ if (ClassRegistry::init($modelClass)->hasField('avatar')) {
 				if (in_array($columnType, array('date', 'datetime'))) {
 					echo "\t\techo \$this->Form->input('{$field}', array({$field_options},'type' => 'text', 'class' => '{$columnType}'));\n";
 				} elseif ($field == 'avatar') {
-					echo "\t\techo \$this->Form->input('file', array({$field_options},'type' => 'file', 'label' => __d('{$plugin_domain}','Image')));\n";
+					echo "\t\techo \$this->Form->input('file', array({$field_options},'type' => 'file', 'label' => ".$tools->translate('Image')."));\n";
+                    } elseif ($field == 'status') {
+                         echo "\t\techo \$this->Form->input('{$field}', array({$field_options},'options'=>\$status_list));\n";
 				} elseif($field!=$field_name){
-        } else{
-          echo "\t\techo \$this->Form->input('{$field}',array({$field_options}, 'empty'=>__d('{$plugin_domain}','(none)')));\n";
+                         echo "\t\techo \$this->Form->input('{$field}',array({$field_options}, 'empty'=>".$tools->translate('(none)')."));\n";
+                    } else{
 					echo "\t\techo \$this->Form->input('{$field}',array({$field_options}));\n";
 				}
 			}
@@ -43,8 +49,8 @@ if (ClassRegistry::init($modelClass)->hasField('avatar')) {
 ?>
 	</fieldset>
 <?php
-	echo "<?php \$link = \$this->Html->link(__d('{$plugin_domain}','Cancel'), array('action' => 'index'), array(), __d('{$plugin_domain}','Discard changes?')); ?>";
-	echo "<?php echo \$this->Form->submit(__d('{$plugin_domain}','Save'), array('before' => \$link)); ?>\n";
+	echo "<?php \$link = \$this->Html->link(".$tools->translate('Cancel').", array('action' => 'index'), array(), ".$tools->translate('Discard changes?')."); ?>";
+	echo "<?php echo \$this->Form->submit(".$tools->translate('Save').", array('before' => \$link)); ?>\n";
 	echo "<?php echo \$this->Form->end(); ?>\n";
 
 ?>

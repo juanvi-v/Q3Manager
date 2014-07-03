@@ -1,12 +1,16 @@
 <?php
+require_once(dirname(__FILE__).'/../utils/Tools.php');
+
 $plugin_domain=Inflector::underscore($plugin);
+$tools= new Tools($plugin_domain);
+
 $parent_field=Inflector::underscore($modelClass);
 echo "<?php\n";
 echo "echo \$this->Form->create('{$modelClass}',array('url' => array('action' => 'index','plugin'=>false),'id'=>'index_form'));\n";
 echo "?>\n";
 ?>
 <div class="<?php echo $pluralVar; ?> index">
-	<h2><?php echo "<?php echo __d('{$plugin_domain}','{$pluralHumanName}'); ?>"; ?></h2>
+	<h2><?php echo "<?php echo ".$tools->translate($pluralHumanName)."; ?>"; ?></h2>
 
 	<?php
 		if (!empty($associations['belongsTo'])) {
@@ -20,7 +24,7 @@ echo "?>\n";
 		<li>
 			<?php echo "<?php echo \$this->Html->link(
 							\$this->Html->image('icons/add.png',
-							array('alt' => '')) . ' ' . __d('{$plugin_domain}','New'),
+							array('alt' => '')) . ' ' . ".$tools->translate('New').",
 							array('action' => 'add'),
 							array('escape' => false)
 						); ?>\n"; ?>
@@ -29,7 +33,7 @@ echo "?>\n";
 		<li>
 			<?php echo "<?php echo \$this->Html->link(
 							\$this->Html->image('icons/cross.png',
-							array('alt' => '')) . ' ' . __d('{$plugin_domain}','Delete'),
+							array('alt' => '')) . ' ' . ".$tools->translate('Delete').",
 							array('action' => 'delete'),
 							array('escape' => false, 'class' => 'index_form_link')
 						); ?>\n"; ?>
@@ -42,7 +46,7 @@ echo "?>\n";
 		<?php
 			echo "<?php echo \$this->Html->link(
 					\$this->Html->image('icons/unlocked.png',
-					array('alt'=>'')).' '.__d('{$plugin_domain}','Enable'),
+					array('alt'=>'')).' '.".$tools->translate('Enable').",
 					array('action'=>'set_status', STATUS_ENABLED),
 					array('escape'=>false, 'class' => 'index_form_link')
 				);?>\n";
@@ -53,7 +57,7 @@ echo "?>\n";
 		<?php
 			echo "<?php echo \$this->Html->link(
 					\$this->Html->image('icons/locked.png',
-					array('alt'=>'')).' '.__d('{$plugin_domain}','Disable'),
+					array('alt'=>'')).' '.".$tools->translate('Disable').",
 					array('action'=>'set_status', STATUS_DISABLED),
 					array('escape'=>false, 'class' => 'index_form_link')
 				);?>\n";
@@ -92,30 +96,30 @@ echo "?>\n";
 				$referenced_field=$field;
 			}
 			?>
-		<th><?php echo "<?php echo \$this->Paginator->sort('{$referenced_field}',__d('{$plugin_domain}','".Inflector::humanize($field_name)."')); ?>"; ?></th>
+		<th><?php echo "<?php echo \$this->Paginator->sort('{$referenced_field}',".$tools->translate(Inflector::humanize($field_name))."); ?>"; ?></th>
 		<?php if($field=='status'){
-				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$status_list,'required'=>false));?></td>";
+				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>".$tools->translate('(any)').", 'options'=>\$status_list,'required'=>false));?></td>";
 			}
 			elseif($field_name!=$field){
 				if($field==$parent_field){
-					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$parent_".Inflector::pluralize($field_name).",'required'=>false));?></td>";
+					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>".$tools->translate('(any)').", 'options'=>\$parent_".Inflector::pluralize($field_name).",'required'=>false));?></td>";
 				}
 				else{
-					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>__d('{$plugin_domain}','(any)'), 'options'=>\$".Inflector::pluralize($field_name).",'required'=>false));?></td>";
+					$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false, 'empty'=>".$tools->translate('(any)').", 'options'=>\$".Inflector::pluralize($field_name).",'required'=>false));?></td>";
 				}
 
 			}
 			else{
-				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false,'type'=>'text','placeholder'=>__d('{$plugin_domain}','Filter by %s',__d('{$plugin_domain}','$field')),'required'=>false));?></td>";
+				$filter_row.="\n\t\t<td><?php echo \$this->Form->input('{$field}',array('label'=>false,'type'=>'text','placeholder'=>".$tools->translate('Filter by %s',$tools->translate($field)).",'required'=>false));?></td>";
 			}
 			?>
 	<?php endforeach; ?>
 		<?php $filter_row.="\n<td class=\"actions\"><?php
-			echo \$this->Form->button(__d('{$plugin_domain}','Search'));
-			echo \$this->Html->link(__d('{$plugin_domain}','Reset filter'), array('action' => 'index'));
+			echo \$this->Form->button(".$tools->translate('Search').");
+			echo \$this->Html->link(".$tools->translate('Reset filter').", array('action' => 'index'));
 		?></td>
 	</tr>";?>
-		<th class="actions"><?php echo "<?php echo __d('{$plugin_domain}','Actions'); ?>"; ?></th>
+		<th class="actions"><?php echo "<?php echo ".$tools->translate('Actions')."; ?>"; ?></th>
 	</tr>
 
 	<?php
@@ -147,14 +151,14 @@ echo "?>\n";
 				if ($field == 'status') {
 					echo "\t\t<td class=\"icon\">
 						<?php if (\${$singularVar}['{$modelClass}']['{$field}']) {
-							\$image = \$this->Html->image('icons/unlocked.png', array('alt' => __d('{$plugin_domain}','Disable')));
+							\$image = \$this->Html->image('icons/unlocked.png', array('alt' => ".$tools->translate('Disable')."));
 							echo \$this->Html->link(
 								\$image,
 								array('action' => 'set_status', STATUS_DISABLED, \${$singularVar}['{$modelClass}']['{$primaryKey}']),
 								array('escape' => false)
 							);
 						} else {
-							\$image = \$this->Html->image('icons/locked.png', array('alt' => __d('{$plugin_domain}','Enable')));
+							\$image = \$this->Html->image('icons/locked.png', array('alt' => ".$tools->translate('Enable')."));
 							echo \$this->Html->link(
 								\$image,
 								array('action' => 'set_status', STATUS_ENABLED, \${$singularVar}['{$modelClass}']['{$primaryKey}']),
@@ -190,9 +194,9 @@ echo "?>\n";
 			}
 		}
 		echo "\t\t<td class=\"actions\">\n";
-		echo "\t\t\t<?php echo \$this->Html->link(__d('{$plugin_domain}','View'), array('action' => 'view', \${$singularVar}['{$modelClass}']['{$primaryKey}'])); ?>\n";
-		echo "\t\t\t<?php echo \$this->Html->link(__d('{$plugin_domain}','Edit'), array('action' => 'edit', \${$singularVar}['{$modelClass}']['{$primaryKey}'])); ?>\n";
-		echo "\t\t\t<?php echo \$this->Html->link(__d('{$plugin_domain}','Delete'), array('action' => 'delete', \${$singularVar}['{$modelClass}']['{$primaryKey}']), array('confirm'=>__d('{$plugin_domain}','Are you sure to delete %s?', \${$singularVar}['{$modelClass}']['{$displayField}']))); ?>\n";
+		echo "\t\t\t<?php echo \$this->Html->link(".$tools->translate('View').", array('action' => 'view', \${$singularVar}['{$modelClass}']['{$primaryKey}'])); ?>\n";
+		echo "\t\t\t<?php echo \$this->Html->link(".$tools->translate('Edit').", array('action' => 'edit', \${$singularVar}['{$modelClass}']['{$primaryKey}'])); ?>\n";
+		echo "\t\t\t<?php echo \$this->Html->link(".$tools->translate('Delete').", array('action' => 'delete', \${$singularVar}['{$modelClass}']['{$primaryKey}']), array('confirm'=>".$tools->translate('Are you sure to delete %s?', "\${$singularVar}['{$modelClass}']['{$displayField}']").")); ?>\n";
 		echo "\t\t</td>\n";
 	echo "\t</tr>\n";
 
@@ -203,16 +207,16 @@ echo "?>\n";
 	<p>
 	<?php echo "<?php
 	echo \$this->Paginator->counter(array(
-	'format' => __d('{$plugin_domain}','Page {:page} of {:pages}, viewing {:current} registers from total {:count}, beggining from {:start}, ending at {:end}')
+	'format' => ".$tools->translate('Page {:page} of {:pages}, viewing {:current} registers from total {:count}, beggining from {:start}, ending at {:end}')."
 	));
 	?>"; ?>
 	</p>
 	<div class="paging">
 	<?php
 		echo "<?php\n";
-		echo "\t\techo \$this->Paginator->prev('< ' . __d('{$plugin_domain}','previous'), array(), null, array('class' => 'prev disabled'));\n";
+		echo "\t\techo \$this->Paginator->prev('< ' . ".$tools->translate('previous').", array(), null, array('class' => 'prev disabled'));\n";
 		echo "\t\techo \$this->Paginator->numbers(array('separator' => ''));\n";
-		echo "\t\techo \$this->Paginator->next(__d('{$plugin_domain}','next') . ' >', array(), null, array('class' => 'next disabled'));\n";
+		echo "\t\techo \$this->Paginator->next(".$tools->translate('next')." . ' >', array(), null, array('class' => 'next disabled'));\n";
 		echo "\t?>\n";
 	?>
 	</div>
