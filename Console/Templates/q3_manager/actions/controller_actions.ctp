@@ -360,7 +360,11 @@ $tools= new Tools($plugin_domain);
 		} else {
 			throw new NotFoundException(<?php echo $tools->translate(ucfirst(strtolower($pluralHumanName)).' not found');?>);
 		}
-		$this->redirect(array('action' => 'index'));
+          $referer=$this->referer();
+          if(empty($referer)){
+               $referer=array('action'=>'index');
+          }
+		$this->redirect($referer);
 	}
 
 <?php endif; //hasField status ?>

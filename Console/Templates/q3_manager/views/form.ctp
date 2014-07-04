@@ -18,7 +18,9 @@ if (ClassRegistry::init($modelClass)->hasField('avatar')) {
 		<legend><?php printf("<?php echo ".$tools->translate('%s %%s',$tools->translate('%s'))."; ?>", $actionTitle , $singularHumanName); ?></legend>
 <?php
 		echo "\t<?php\n";
-
+          echo "\t\tif(empty(\$return_url)){
+               \$return_url=array('action' => 'index');
+          }";
     echo "\t\techo \$this->Form->hidden('return_url',array('value'=>\$return_url));\n";
 		foreach ($fields as $field) {
         $field_name=preg_replace('/_id$/','',$field);
@@ -49,7 +51,7 @@ if (ClassRegistry::init($modelClass)->hasField('avatar')) {
 ?>
 	</fieldset>
 <?php
-	echo "<?php \$link = \$this->Html->link(".$tools->translate('Cancel').", array('action' => 'index'), array(), ".$tools->translate('Discard changes?')."); ?>";
+	echo "<?php \$link = \$this->Html->link(".$tools->translate('Cancel').", \$return_url, array(), ".$tools->translate('Discard changes?')."); ?>";
 	echo "<?php echo \$this->Form->submit(".$tools->translate('Save').", array('before' => \$link)); ?>\n";
 	echo "<?php echo \$this->Form->end(); ?>\n";
 
