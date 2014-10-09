@@ -231,7 +231,7 @@ $tools= new Tools($plugin_domain);
           echo "\t\t\$status_list=\$this->{$currentModelName}->getStatusList();\n";
         }
         elseif($field_name!=$field){
-          $field_list=Inflector::pluralize($field_name);
+          $field_list=Inflector::variable(Inflector::pluralize($field_name));
           $field_model=Inflector::camelize($field_name);
           if(!in_array("'$field_list'",$compact)){
             echo "\t\t\$$field_list=ClassRegistry::init('$field_model')->find('list');\n";
