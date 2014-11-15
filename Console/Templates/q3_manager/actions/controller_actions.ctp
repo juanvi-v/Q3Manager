@@ -18,7 +18,6 @@ $tools= new Tools($plugin_domain);
 		unset($this->params->data['<?php echo $currentModelName;?>']['main']); //select all items
 
 		$conditions = $this->_parseSearch();
-		$this->set('<?php echo $pluralName ?>', $this->paginate($conditions));
     <?php
     if($modelObj){
       $schema=$modelObj->schema(true);
@@ -65,7 +64,7 @@ $tools= new Tools($plugin_domain);
     }
     ?>
 
-    $this->set('<?php echo $pluralName ?>', $this->paginate($conditions));
+	 	$this->set('<?php echo $pluralName ?>', $this->paginate($conditions));
 		$this->_setSelects();
 	}
 
